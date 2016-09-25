@@ -1,6 +1,10 @@
 #ifndef _INTRUSIVE_LINKED_LIST_H_
 #define _INTRUSIVE_LINKED_LIST_H_
 
+/*
+** written by Mark Promislow of Green Frog Applications, LLC
+*/
+
 namespace Intrusive
 {
 

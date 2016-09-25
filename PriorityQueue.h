@@ -1,6 +1,10 @@
 #ifndef _PRIORITY_QUEUE_
 #define _PRIORITY_QUEUE_
 
+/*
+** written by Mark Promislow of Green Frog Applications, LLC
+*/
+
 #include <string.h>
 
 #include <functional>

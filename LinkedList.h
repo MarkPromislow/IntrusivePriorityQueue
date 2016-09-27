@@ -5,6 +5,8 @@
 ** written by Mark Promislow of Green Frog Applications, LLC
 */
 
+#include <functional>
+
 namespace Intrusive
 {
 
@@ -42,7 +44,6 @@ public:
 	size_t size() { size_t s = 0; for (LinkedListObject *o = _list._next; o != &_list; o = o->_next) ++s; return s; }
 };
 
-#include <functional>
 template<typename T, typename L = std::less<T>>
 class SortedList
 {

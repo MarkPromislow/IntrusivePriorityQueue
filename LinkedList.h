@@ -1,5 +1,4 @@
-#ifndef _INTRUSIVE_LINKED_LIST_H_
-#define _INTRUSIVE_LINKED_LIST_H_
+#pragma once
 
 /*
 ** written by Mark Promislow of Green Frog Applications, LLC
@@ -15,40 +14,42 @@ class LinkedListObject
 protected:
 	LinkedListObject *_prev;
 	LinkedListObject *_next;
-	friend class IntrusiveLinkedList;
+	friend class LinkedList;
 public:
-	LinkedListObject() : _prev(0), _next(0) {}
-	inline void link(LinkedListObject *o) { o->_prev = this; o->_next = _next; _next->_prev = o; _next = o; }
+	LinkedListObject() : _prev(this), _next(this) {}
+	inline void linkAfter(LinkedListObject *o) { o->_prev = this; o->_next = _next; _next->_prev = o; _next = o; }
 	inline void linkBefore(LinkedListObject *o) { o->_prev = _prev; o->_next = this; _prev->_next = o; _prev = o; }
-	inline void unlink() { _next->_prev = _prev; _prev->_next = _next; }
-	inline void erase() { if (_prev) { _next->_prev = _prev; _prev->_next = _next; _prev = 0; _next = 0; } }
+	inline void unlink() { _prev->_next = _next; _next->_prev = _prev; _prev = _next = this; }
 	inline LinkedListObject *next() { return _next; }
 	inline LinkedListObject *prev() { return _prev; }
 };
 
-class IntrusiveLinkedList: public LinkedListObject
+class LinkedList
 {
 protected:
 	LinkedListObject _list;
 public:
-	IntrusiveLinkedList() { _list._next = _list._prev = &_list; }
-	inline bool empty() { return _list._next == &_list; }
-	inline void clear() { _list._next = _list._prev = &_list; }
+	LinkedList() {}
+	LinkedList(const LinkedList &list) {}
+	inline bool empty() { return _list._prev == &_list; }
+	inline void clear() { _list.unlink(); }
 	inline void push_back(LinkedListObject *o) { o->_prev = _list._prev; o->_next = &_list; _list._prev->_next = o; _list._prev = o; }
 	inline void push_front(LinkedListObject *o) { o->_prev = &_list; o->_next = _list._next; _list._next->_prev = o; _list._next = o; }
 	inline LinkedListObject *begin() { return _list._next; }
 	inline LinkedListObject *rbegin() { return _list._prev; }
 	inline LinkedListObject *end() { return &_list; }
-	inline LinkedListObject *pop_front() { LinkedListObject *n(0); if (_list._next != &_list) {n = _list._next; n->erase(); } return n; }
-	inline LinkedListObject *pop_back() { LinkedListObject *p(0);if (_list._prev != &_list)	{p = _list._prev; p->erase(); } return p; }
+	inline LinkedListObject *pop_front() { LinkedListObject *n(0); if (_list._next != &_list) { n = _list._next; n->unlink(); } return n; }
+	inline LinkedListObject *pop_back() { LinkedListObject *p(0); if (_list._prev != &_list) { p = _list._prev; p->unlink(); } return p; }
 	size_t size() { size_t s = 0; for (LinkedListObject *o = _list._next; o != &_list; o = o->_next) ++s; return s; }
+private:
+	LinkedList& operator = (const LinkedList &) = delete;
 };
 
 template<typename T, typename L = std::less<T>>
 class SortedList
 {
 protected:
-	IntrusiveLinkedList _list;
+	LinkedList _list;
 	L _less;
 public:
 	SortedList(L &less = L()): _less(less) {}
@@ -115,7 +116,7 @@ bool SortedList<T, L>::check()
 }
 
 template<typename T, typename L = std::less<T>>
-class MinimumSortedList : public IntrusiveLinkedList
+class MinimumSortedList : public SortedList<T, L>
 {
 protected:
 	size_t _maxSize;
@@ -149,4 +150,3 @@ T *MinimumSortedList<T, L>::insert(T *obj)
 
 } // namespace Intrusive
 
-#endif

@@ -54,7 +54,7 @@ public:
 	// move item to new position in the queue
 	inline void reprioritize(T *item);
 	// access item at the top of the queue
-	inline T *top()	{return _size > static_cast<T>(_heap[1]): 0;}
+	inline T *top()	{return static_cast<T>(_heap[1]);}
 	// number of items in the queue
 	inline size_t size() {return _size;}
 
@@ -226,3 +226,4 @@ void PriorityQueue<T, L>::reprioritize(T *item)
 } // namespace Intrusive
 
 #endif
+

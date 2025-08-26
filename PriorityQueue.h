@@ -23,7 +23,7 @@ namespace Intrusive
 		friend class PriorityQueue;
 	public:
 		HeapObject() : _position(0) {}
-		size_t position() { return _position; }
+		size_t position() const noexcept { return _position; }
 	};
 
 	template<typename T, typename L = std::less<T> >
@@ -40,26 +40,26 @@ namespace Intrusive
 			*_heap = 0;
 		}
 		// remove all items from the queue
-		void clear();
+		void clear() noexcept;
 		// remove item from the queue
-		void erase(T *item);
-		T* getPosition(size_t p) { return !p || p > _size ? nullptr : static_cast<T*>(_heap[p]); }
+		void erase(T *item) noexcept;
+		T* getPosition(size_t p) const noexcept { return !p || p > _size ? nullptr : static_cast<T*>(_heap[p]); }
 		// remove item at the top of the queue
-		T* pop();
+		T* pop() noexcept;
 		// add item to the queue
-		void push(T* item);
+		void push(T* item) noexcept;
 		// move item to new position in the queue
-		void reprioritize(T* item);
+		void reprioritize(T* item) noexcept;
 		// access item at the top of the queue
-		T* top() { return static_cast<T*>(_heap[1]); }
+		T* top() const noexcept { return static_cast<T*>(_heap[1]); }
 		// number of items in the queue
-		size_t size() { return _size; }
+		size_t size() const noexcept { return _size; }
 
 		~PriorityQueue() { clear(); }
 	};
 
 	template<typename T, typename L>
-	void PriorityQueue<T, L>::clear()
+	void PriorityQueue<T, L>::clear() noexcept
 	{
 		for (HeapObject** ptr(_heap + 1), **end(_heap + _size + 1); ptr < end; ++ptr)
 			(*ptr)->_position = 0;
@@ -67,7 +67,7 @@ namespace Intrusive
 	}
 
 	template<typename T, typename L>
-	void PriorityQueue<T, L>::erase(T *item)
+	void PriorityQueue<T, L>::erase(T *item) noexcept
 	{
 		if (!item || !item->HeapObject::_position) return;
 
@@ -102,7 +102,7 @@ namespace Intrusive
 	}
 
 	template<typename T, typename L>
-	T* PriorityQueue<T, L>::pop()
+	T* PriorityQueue<T, L>::pop() noexcept
 	{
 		if (!_size) return 0;
 
@@ -141,7 +141,7 @@ namespace Intrusive
 	}
 
 	template<typename T, typename L>
-	void PriorityQueue<T, L>::push(T* item)
+	void PriorityQueue<T, L>::push(T* item) noexcept
 	{
 		// check size
 		if (++_size > _maxSize)
@@ -171,7 +171,7 @@ namespace Intrusive
 	}
 
 	template<typename T, typename L>
-	void PriorityQueue<T, L>::reprioritize(T* item)
+	void PriorityQueue<T, L>::reprioritize(T* item) noexcept
 	{
 		size_t current = item->HeapObject::_position;
 		size_t next = current / 2;
@@ -220,4 +220,3 @@ namespace Intrusive
 	}
 
 } // namespace Intrusive
-

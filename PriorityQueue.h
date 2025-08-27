@@ -73,32 +73,14 @@ namespace Intrusive
 
 		// replace current with last
 		HeapObject* lastItem = _heap[_size];
+		--_size;
 		size_t current = item->HeapObject::_position;
 		HeapObject** currentPtr = _heap + current;
-		for (size_t next(current * 2), end(_size); next < end; next = (current = next) * 2)
-		{
-			HeapObject** nextPtr = _heap + next;
-			if (_less(*static_cast<T*>(*nextPtr), *static_cast<T*>(*(nextPtr + 1))))
-			{
-				++nextPtr;
-				++next;
-			}
-
-			if (_less(*static_cast<T*>(lastItem), *static_cast<T*>(*nextPtr)))
-			{
-				// move
-				*currentPtr = *nextPtr;
-				(*currentPtr)->_position = current;
-				currentPtr = nextPtr;
-			}
-			else
-				break;
-		}
 		*currentPtr = lastItem;
 		lastItem->_position = current;
+		reprioritize(static_cast<T*>(lastItem));
 
-		item->_position = 0;
-		--_size;
+		item->HeapObject::_position = 0;
 	}
 
 	template<typename T, typename L>
@@ -113,10 +95,10 @@ namespace Intrusive
 
 		// start at top
 		size_t current(1);
-		for (size_t next(current * 2); next < _size; next = (current = next) * 2)
+		for (size_t next(current * 2); next < _size + 1; next = (current = next) * 2)
 		{
 			HeapObject** nextPtr = _heap + next;
-			if (_less(*static_cast<T*>(*nextPtr), *static_cast<T*>(*(nextPtr + 1))))
+			if (next < _size && _less(*static_cast<T*>(*nextPtr), *static_cast<T*>(*(nextPtr + 1))))
 			{
 				++nextPtr;
 				++next;
@@ -195,10 +177,10 @@ namespace Intrusive
 		}
 		else
 		{
-			for (size_t next(current * 2), end(_size); next < end; next = (current = next) * 2)
+			for (size_t next(current * 2), end(_size + 1); next < end; next = (current = next) * 2)
 			{
 				HeapObject** nextPtr = _heap + next;
-				if (_less(*static_cast<T*>(*nextPtr), *static_cast<T*>(*(nextPtr + 1))))
+				if (next < _size && _less(*static_cast<T*>(*nextPtr), *static_cast<T*>(*(nextPtr + 1))))
 				{
 					++nextPtr;
 					++next;
@@ -220,3 +202,4 @@ namespace Intrusive
 	}
 
 } // namespace Intrusive
+
